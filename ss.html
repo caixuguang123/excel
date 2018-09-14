@@ -1,0 +1,529 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>随访管理系统</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,Chrome=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" type="image/x-icon" href="../favicon.ico" />
+    <link href="../styles/lib/bootstrap3.css" rel="stylesheet" />
+    <link href="../styles/jquery-ui-1.11.4.custom.min.css" rel="stylesheet" />
+    <link href="../styles/themes/cupertino/jquery-ui.css" rel="stylesheet" />
+    <link href="../styles/framework/common.css" rel="stylesheet" />
+    <link href="../styles/framework/paging.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" media="all">
+    <style type="text/css">
+        .backImg {
+            margin: 0 auto;
+            background: url('../images/login/login_bj0.png') no-repeat center center fixed;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            background-positon: 100%, 100%;
+        }
+    </style>
+    </link>
+    <style xml:space="preserve">
+	.dropdown{font-color:white;}
+	</style>
+    <!--[if lt IE 9]>
+    <script src="../scripts/html5shiv.min.js"></script>
+    <script src="../scripts/respond.min.js"></script>
+    <![endif]-->
+    <!--[if lt IE 9]>
+    <style>
+        select.form-control{
+            padding-left:0px;
+            padding-right:0px;
+        }
+    </style>
+    <![endif]-->
+    <script src="../scripts/lib/jquery.js" xml:space="preserve"></script>
+<script src="../scripts/jquery-ui-1.11.4.custom.min.js" xml:space="preserve"></script>
+
+	<script src="../scripts/lib/bootstrap.js" xml:space="preserve"></script>
+
+<script src="../scripts/framework/common.js" xml:space="preserve"></script>
+<script src="../scripts/framework/template.js" xml:space="preserve"></script>
+<script type="text/javascript" src="../scripts/common-util/submitUtil.js" xml:space="preserve"></script>
+<script type="text/javascript" src="../scripts/common-util/paging.js" xml:space="preserve"></script>
+<script type="text/javascript" src="../scripts/common-util/common.js" xml:space="preserve"></script>
+
+<script type="text/javascript" xml:space="preserve">
+	/*<![CDATA[*/
+    $(function() {
+        function updateGroupTypeConfirm(orgCodeList, compareTeamList, nextOneFlag) {
+            var groupTypeValue = $("#groupTypeValue").val();
+            var curGroupTypeValue = "";
+            if(compareTeamList != "") {
+                curGroupTypeValue = $("input[name=groupType]:checked").val();
+            }
+            if(groupTypeValue != ""&&groupTypeValue != "0"&&groupTypeValue != curGroupTypeValue) {
+                $("#confirmModal").find(".confirmContent").text("修改分组模式会删除设置的入组条件,是否继续操作？");
+                $("#confirm").trigger("click");
+                $("#confirmModal").on("hidden.bs.modal",function(e){});
+                //清除原有事件,重新绑定
+                $("#confirmModal").find(".yesBtn").off();
+                $("#confirmModal").find(".yesBtn").on("click",function(e){
+                    submitForm("1", orgCodeList, compareTeamList, nextOneFlag);
+                });
+            } else {
+                submitForm("0", orgCodeList, compareTeamList, nextOneFlag);
+            }
+        }
+        function submitForm(delRecruitConditionFlag, orgCodeList, compareTeamList, nextOneFlag) {
+            $("#basicInformationForm").attr(
+                "action",
+                "../basicInformation/saveOrUpdateBasicInformation.html?delRecruitConditionFlag=" + delRecruitConditionFlag + "&orgCodeList="+ orgCodeList+"&nextOneFlag=" + nextOneFlag + compareTeamList);
+            $("#basicInformationForm").submit();
+        }
+        var recruitByVisitFlag = '0';
+        $("#basicInformation").click(
+            function() {
+                $("#updateImage").attr("src",
+                    "../images/template/insertorupdateimage.png");
+            });
+        $(".basicInformation").click(function(){
+            if($("#basicInformationFlag").attr('value')=='1'){
+
+                var orgCodeList = new Array();
+                var addOrgCodeList=new Array();
+                $("li[name='orgCode']").each(function() {
+                    orgCodeList.push($(this).attr('rel'));
+                });
+                var responsibleDeptCode;
+                var num=0;
+                $("#searchDiv").find("input[class='maininput form-control']").each(function(){
+
+                    if(num==0){
+                        responsibleDeptCode=$("#select2-chosen-1").text();
+                        num=1;
+                    }
+
+                });
+                if($("#responsiblePersonName").val().length>49||$("#contactNumber").val().length>20||$("#studyName").val().length>200||$("#studyBackground").val().length>500){
+                    $("#alertMessage").attr("href", "../modal/mustBasicInfo1.html?MSG=MSG_005&contactNumber="+$("#contactNumber").val()+
+                        "&studyName="+$("#studyName").val() +
+                        "&studyBackground="+$("#studyBackground").val()+"&responsiblePersonName="+$("#responsiblePersonName").val());
+                    $("#alertMessage").trigger("click");
+                    $('#newMessage').on('hidden.bs.modal', function (e) {
+                        $(this).removeData("bs.modal");
+                    });
+                    return;
+                }
+                //获取对照组
+                var compareTeamList = "";
+                var lis = $("#addUl > li").each(function(index, item) {
+                    var followupCompareSn = $(item).find("span").attr("value");
+                    var followupCompareName = $(item).text();
+                    if(followupCompareSn != null&&followupCompareSn != "") {
+                        compareTeamList += "&compareTeamList[" + index + "].followupCompareSn=" + followupCompareSn;
+                    }
+                    if(followupCompareName != null&&followupCompareName != "") {
+                        compareTeamList += "&compareTeamList[" + index + "].followupCompareName=" + followupCompareName;
+                    }
+                });
+                if(orgCodeList.length==0||$("#responsibleOrgCode").val()==''||responsibleDeptCode==''
+                    ||$("#responsiblePersonName").val()==''||$("#studyStatus").val()==""||$("#studyName").val()==""
+                    ||$("#isBatchConfirm").val()==""||$("#defaultConcernedOperation").val()==""){
+                    $("#alertMessage").attr("href", "../modal/mustBasicInfo.html?MSG=MSG_005&responsibleOrgCode="+$("#responsibleOrgCode").val()+
+                        "&responsibleDeptCode="+responsibleDeptCode +
+                        "&responsiblePersonName="+$("#responsiblePersonName").val()
+                        +"&orgCodeList="+orgCodeList.length+"&studyStatus="+$("#studyStatus").val()+"&studyName="+$("#studyName").val()
+                        +"&isBatchConfirm="+$("#isBatchConfirm").val()
+                        +"&defaultConcernedOperation="+$("#defaultConcernedOperation").val());
+                    $("#alertMessage").trigger("click");
+                    $('#newMessage').on('hidden.bs.modal', function (e) {
+                        $(this).removeData("bs.modal");
+                    });
+                }else{
+                    updateGroupTypeConfirm(orgCodeList, compareTeamList, $(this).attr('value'));
+                }
+
+            }else {
+
+                if($(this).attr('value')=='2'){
+                    location.href="../basicInformation/jumpTermDefinition.html?studySn="+$("#studySn").val()+"&flag=1";
+                }else if($(this).attr('value')=='3'){
+                    location.href="../basicInformation/jumpFormDesign.html?studySn="+$("#studySn").val();
+                }else if($(this).attr('value')=='4'){
+                    location.href="../basicInformation/jumpEventDefinition.html?studySn="+$("#studySn").val();
+                }else if($(this).attr('value')=='5'){
+                    location.href="../basicInformation/userAuthManage.html?studySn="+$("#studySn").val()+"&flag=1";
+
+                }
+            }
+
+        });
+    });
+    window.onbeforeunload = function() {
+        var exitClosed = 'closed';
+        // 关闭按钮关闭浏览器记录用户退出系统日志
+        buttonClosed(exitClosed);
+    }
+    /*]]>*/
+</script>
+</head>
+<body>
+<!--header  -->
+<header class="navbar navbar-static-top bs-docs-nav" id="top" role="navigation"><!-- role="banner" -->
+    <div class="container-fluid" style="background-color: #3B70BE; border-bottom: 1px #ccc solid;">
+        <!-- style="background-color: #CBE6FD;" -->
+        <div class="navbar-header">
+            <button class="navbar-toggle collapsed" type="button" data-toggle="collapse" data-target="#bs-navbar" aria-controls="bs-navbar" aria-expanded="false">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <img src="../images/logo.png" class="img-responsive title-small" />
+        </div>
+        <nav id="bs-navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav bar-title">
+
+                <li class="header-logo-small"><img src="../images/logo.png" class="img-responsive center-block" /></li>
+                <li class="header-line-small"></li>
+                <li class="header-title-small">随访管理系统</li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+
+
+                <li><a id="srList" href="../sr/srList_0.html?q=init" shape="rect">随访组列表</a></li>
+
+
+
+
+
+                <li class="dropdown" id="srPerson"><a id="srPersonManager" class="dropdown-toggle" data-toggle="dropdown" href="#" shape="rect"> <img src="../images/person.png" style="height: 17px;">dh001</img><b class="caret"></b>
+                </a>
+                    <ul class="dropdown-menu">
+
+                        <li><a id="accountSetting" href="../system/changePassword.html" shape="rect">账户设置</a></li>
+                    </ul>
+                </li>
+                <li><a id="logout" href="javascript:void(0)" shape="rect" onclick="exitSystem(&#39;按钮退出&#39;)">注销</a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+
+<div style="text-align: center">
+    <div class="container" style="width: 100%;">
+        <div class="row clearfix">
+            <div class="col-sm-12 col-md-12 col-lg-12 backImg" style="margin-top:-1%;min-height: 1000px">
+                <h1 style="color:rgb(160, 160, 160);margin-top:5%;">Sorry，页面出错了</h1>
+                <p style="color:rgb(160, 160, 160);font-size:20px;margin-top:2%;">请核对数据或联系技术人员</p>
+                <button type="button" style="margin-top:10%;" onclick="javascript:history.go(-1);">点击返回</button>
+                <button type="button" id="errDetailBtn">查看错误详情</button>
+                <div style="display:none;color:white;margin-top:2%;" id="errDetail">
+                    <div>java.lang.NullPointerException</div>
+                    <div>错误页面地址:http://120.77.45.84:8001/srm/caseCrfForm/saveUserDataCollectForm.html</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        if(typeof $ != 'undefined'){
+            $("#errDetailBtn").click(function(){
+                var _displsy = $("#errDetail").css("display");
+
+                if(_displsy === "none") {
+                    $("#errDetailBtn").text("隐藏错误详情");
+                    $("#errDetail").show();
+                } else {
+                    $("#errDetailBtn").text("查看错误详情");
+                    $("#errDetail").hide();
+                }
+            });
+        } else {
+            var btn = document.getElementById("errDetailBtn");
+            var errDetail = document.getElementById("errDetail");
+            btn.onclick = function (ev) {
+                var _display = errDetail.style.display;
+                if(_display === "none") {
+                    btn.innerText="隐藏错误详情";
+                    errDetail.style.display="block";
+                } else {
+                    btn.innerText="查看错误详情";
+                    errDetail.style.display="none";
+                }
+            }
+        }
+    </script>
+</div>
+<div id="MSG_001" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>请先在列表中选择要操作的记录</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_003" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>保存成功</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveSuccessConfirm" type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_009" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>一次只能修改一条数据，请确认</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_017" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>请输入正确的页码！</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_018" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>输入的页码超过总页数，请重新输入!</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_019" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>翻页异常</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_020" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>表单数据不合法，请检查。</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_021" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>此随访组下已经存在相同名称的表单</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_022" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>CRF名称不允许为空</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_023" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>SECTION名称不允许为空</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="MSG_026" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">提示</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <dl class="dl-horizontal">
+                            <span>左侧项目需填写完整！</span>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<footer class="bs-docs-footer" role="contentinfo">
+    <div class="container-fluid copyright">
+        <span style="font-family: Arial">Copyright &copy;</span> <span style="font-family: Arial">(SRM_V1.00_20180428_R34)</span> <span style="font-family: 方正黑体简体">北大医疗信息技术有限公司</span>
+        <span style="font-family: Arial">All Rights Reserved</span>
+    </div>
+</footer>
+</html>
