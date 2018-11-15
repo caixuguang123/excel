@@ -12,9 +12,9 @@ var url = 'http://120.77.45.84:8001/srm/srList/savePatient.html';
 
 var j = request.jar();
 
-j.setCookie(cookie, 'http://120.77.45.84:8001');
+j.setCookie(cookie, 'http://www.systemcdm.com:8678');
 
-var wb = XLSX.readFile("new2.xls");
+var wb = XLSX.readFile("2018new.xls");
 
 const worksheet = wb.Sheets[wb.SheetNames[0]];
 
