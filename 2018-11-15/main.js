@@ -572,13 +572,21 @@ async function main() {
             }
             console.log(user['姓名']);
             const id = await Basic(user);
+            await sleep(3000);
             await yibanqingkuang(user, id);
+            await sleep(3000);
             const investigationId = await searchInvestigation(id, 2);
+            await sleep(3000);
             await saveInvestigation(user, investigationId);
+            await sleep(3000);
             await saveLifeStyle(user, investigationId);
+            await sleep(3000);
             await saveFamilyHistory(user, investigationId);
+            await sleep(3000);
             await savePast(user, investigationId);
+            await sleep(3000);
             await bodyCheck(user, investigationId);
+            await sleep(3000);
             await saveLab(user, investigationId);
             await sleep(3000);
         } catch (e) {
