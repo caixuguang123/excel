@@ -6,7 +6,7 @@ var sleep = require('await-sleep');
 // var r = request.defaults({'proxy': 'http://10.86.34.219:8080'});
 
 // var cookie = request.cookie('JSESSIONID=8C011887DCC6CE4D54B15CB31064D00B')
-var cookie = request.cookie('JSESSIONID=node014624z5pl23qxx2r4des820lw108.node0; orgType=3');
+var cookie = request.cookie('JSESSIONID=node01ayikncz99i7rfznp0h06ysnt10.node0; orgType=3');
 
 
 var url = 'http://120.77.45.84:8001/srm/srList/savePatient.html';
@@ -70,6 +70,7 @@ async function Basic(user) {
             form,
         }, (err, res, body) => {
             body = JSON.parse(body);
+            console.log(body)
             if (!body || err) {
                 reject(0);
             }
@@ -564,7 +565,7 @@ async function saveLab(user, id) {
 
 async function main() {
 
-    for (let i = 7; i < 49; i++) {
+    for (let i = 49; i < 100; i++) {
         try {
             const user = arr[i];
             if (!user['姓名']) {
