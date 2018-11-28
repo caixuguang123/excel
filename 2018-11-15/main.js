@@ -6,7 +6,7 @@ var sleep = require('await-sleep');
 // var r = request.defaults({'proxy': 'http://10.86.34.219:8080'});
 
 // var cookie = request.cookie('JSESSIONID=8C011887DCC6CE4D54B15CB31064D00B')
-var cookie = request.cookie('JSESSIONID=node01ayikncz99i7rfznp0h06ysnt10.node0; orgType=3');
+var cookie = request.cookie('JSESSIONID=node01vevyjpwvs5rufejyqedj0y2185.node0; orgType=3');
 
 
 var url = 'http://120.77.45.84:8001/srm/srList/savePatient.html';
@@ -16,7 +16,7 @@ var j = request.jar();
 j.setCookie(cookie, 'http://www.systemcdm.com');
 // j.setHeader('token', 'eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJub2RlMDFjZzlqNzA3YzJocXlyYTcwamczZHhlNmw0MyJ9.wp3FTJn-Wsy6iIj4Kgz7wXLZn2a8kogda_m8iDrWl6k');
 
-var wb = XLSX.readFile("2018new.xls");
+var wb = XLSX.readFile("红旗3期.xlsx");
 
 const worksheet = wb.Sheets[wb.SheetNames[0]];
 
@@ -53,7 +53,7 @@ async function Basic(user) {
     const ruxuanriqi = user['入选日期'];
 
     const form = {
-        orgId: 29,
+        orgId: 31,
         customerName: name,
         contractNumber: contract,
         gender,
@@ -70,7 +70,6 @@ async function Basic(user) {
             form,
         }, (err, res, body) => {
             body = JSON.parse(body);
-            console.log(body)
             if (!body || err) {
                 reject(0);
             }
@@ -97,11 +96,11 @@ async function yibanqingkuang(user, id) {
         nextVisitDate: basicForm['nextVisitDate'],
     };
     form['provinceId'] = 440000;
-    form['cityId'] = 441900;
-    form['countyId'] = 441900111;
-    form['townId'] = 914329655000;
-    form['address'] = address;
-    form['postalcode'] = 523400;
+    form['cityId'] = 440400;
+    form['countyId'] = 440404000;
+    form['townId'] = 440404103000;
+    form['address'] = '广安社区居民委员会' + address;
+    form['postalcode'] = 519090;
 
     const url = 'http://www.systemcdm.com:9009/customer/saveCustomerInfo';
 
@@ -231,7 +230,7 @@ async function saveInvestigation(user, id) {
     if (degree.indexOf('高中') >= 0) {
         degreeOfEducation = 3;
     }
-    if (degree.indexOf('大专') >= 0) {
+    if (degree.indexOf('专') >= 0) {
         degreeOfEducation = 3;
     }
     if (degree.indexOf('本科') >= 0) {
@@ -339,14 +338,14 @@ async function saveLifeStyle(user, id) {
     const url = 'http://www.systemcdm.com:9009/investigation/saveLifestyleByInvestigationId';
 
     let hasSecondSmokingDay = 0;
-    if (day !== '否') {
-        hasSecondSmokingDay = day;
-    }
+    // if (day !== '否') {
+    //     hasSecondSmokingDay = day;
+    // }
     let form = {
         drinkStatus: 3,
-        hasSecondSmokingDay,
+        // hasSecondSmokingDay,
         investigationId: id,
-        isHasSecondSmoking: hasSecondSmokingDay === 0 ? 2 : 1,
+        // isHasSecondSmoking: hasSecondSmokingDay === 0 ? 2 : 1,
         learnHealthCareKnowledgeChannelSet: [],
         smokeStartTime: "1900-01-01",
         smokeStatus: 3,
@@ -565,7 +564,7 @@ async function saveLab(user, id) {
 
 async function main() {
 
-    for (let i = 49; i < 100; i++) {
+    for (let i = 2; i < arr.length; i++) {
         try {
             const user = arr[i];
             if (!user['姓名']) {
@@ -573,22 +572,23 @@ async function main() {
             }
             console.log(user['姓名']);
             const id = await Basic(user);
-            await sleep(3000);
+            await sleep(1000);
             await yibanqingkuang(user, id);
-            await sleep(3000);
+            await sleep(1000);
             const investigationId = await searchInvestigation(id, 2);
-            await sleep(3000);
+            await sleep(1000);
             await saveInvestigation(user, investigationId);
-            await sleep(3000);
+            await sleep(1000);
             await saveLifeStyle(user, investigationId);
-            await sleep(3000);
-            await saveFamilyHistory(user, investigationId);
-            await sleep(3000);
+            await sleep(1000);
+            // await saveFamilyHistory(user, investigationId);
+            // await sleep(1000);
             await savePast(user, investigationId);
-            await sleep(3000);
+            await sleep(1000);
             await bodyCheck(user, investigationId);
-            await sleep(3000);
+            await sleep(1000);
             await saveLab(user, investigationId);
+            console.log('succeed')
             await sleep(3000);
         } catch (e) {
             console.log('err', e)
